@@ -6,4 +6,10 @@
 
 - expo user/repo
 
+#### Installation
+
+```
+git clone https://github.com/chrispaig3/expo; cd expo; cargo install --path .
+```
+
 
