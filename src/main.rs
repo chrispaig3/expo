@@ -10,21 +10,49 @@ struct Cli {
     yes: bool,
 }
 
-fn main() {
-    let cli = Cli::parse();
+enum AuthStatus {
+    Authenticated,
+    NeedsRefresh,
+    Failed,
+}
 
-    // Auth check
+fn check_auth_status() -> AuthStatus {
     let mut auth_check_cmd = Command::new("gh");
     auth_check_cmd.args(["auth", "status", "-h", "github.com"]);
 
-    let auth_check_status = auth_check_cmd.status().expect("Failed to check GitHub authentication status");
-    if !auth_check_status.success() {
-        let mut auth_cmd = Command::new("gh");
-        auth_cmd.args(["auth", "refresh", "-h", "github.com", "-s", "delete_repo"]);
+    let auth_check_status = auth_check_cmd.status();
+    match auth_check_status {
+        Ok(status) if status.success() => AuthStatus::Authenticated,
+        Ok(_) => AuthStatus::NeedsRefresh,
+        Err(_) => AuthStatus::Failed,
+    }
+}
 
-        let auth_status = auth_cmd.status().expect("Failed to refresh GitHub authentication");
-        if !auth_status.success() {
-            eprintln!("Failed to refresh authentication. Please ensure you have the necessary permissions.");
+fn refresh_auth() -> bool {
+    let mut auth_cmd = Command::new("gh");
+    auth_cmd.args(["auth", "refresh", "-h", "github.com", "-s", "delete_repo"]);
+
+    let auth_status = auth_cmd.status();
+    auth_status.map_or(false, |status| status.success())
+}
+
+fn main() {
+    let cli = Cli::parse();
+    
+    // Auth check
+    match check_auth_status() {
+        AuthStatus::Authenticated => {
+            println!("Authentication successful.");
+        }
+        AuthStatus::NeedsRefresh => {
+            println!("Authentication needs to be refreshed.");
+            if !refresh_auth() {
+                eprintln!("Failed to refresh authentication. Please ensure you have the necessary permissions.");
+                return;
+            }
+        }
+        AuthStatus::Failed => {
+            eprintln!("Failed to check GitHub authentication status.");
             return;
         }
     }
