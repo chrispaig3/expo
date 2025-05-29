@@ -17,5 +17,3 @@
 ```
 git clone https://github.com/chrispaig3/expo; cargo install --path expo
 ```
-
-https://github.com/user-attachments/assets/8ce01bbb-068c-42cb-b46a-e8f133be9c84
