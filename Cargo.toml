@@ -4,6 +4,6 @@ name = "expo"
 version = "0.0.1"
 edition = "2024"
 license = "MIT"
-description = "A dryeraser for unwanted GitHub repos written in Rust."
+description = "A dry eraser for unwanted GitHub repos written in Rust."
 [dependencies]
 clap = {version = "4.5.39", features = ["derive"]}
