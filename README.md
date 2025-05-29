@@ -1,5 +1,7 @@
 # Expo
 
+![Image](https://github.com/user-attachments/assets/fcc62bf5-f464-4a43-996e-6d969b4ae280)
+
 ### Warning: This program has destructive capabilities, use at own risk.
 
 > Basic Usage
