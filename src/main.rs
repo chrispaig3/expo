@@ -4,7 +4,7 @@ use std::process::Command;
 #[derive(Parser)]
 #[command(author, version, about)]
 struct Cli {
-    repo: String,
+    repos: Vec<String>,
 
     #[arg(long)]
     yes: bool,
@@ -57,17 +57,19 @@ fn main() {
         }
     }
 
-    let mut cmd = Command::new("gh");
-    cmd.args(["api", "-X", "DELETE", &format!("repos/{}", cli.repo)]);
+    for repo in cli.repos {
+        let mut cmd = Command::new("gh");
+        cmd.args(["api", "-X", "DELETE", &format!("repos/{}", repo)]);
 
-    if cli.yes {
-        let status = cmd.status().expect("Failed to execute gh command");
-        if status.success() {
-            println!("Repository {} deleted.", cli.repo);
+        if cli.yes {
+            let status = cmd.status().expect("Failed to execute gh command");
+            if status.success() {
+                println!("Repository {} deleted.", repo);
+            } else {
+                eprintln!("Failed to delete repository {}.", repo);
+            }
         } else {
-            eprintln!("Failed to delete repository.");
+            println!("Dry run: not deleting repository {}. Use --yes to actually delete.", repo);
         }
-    } else {
-        println!("Dry run: not deleting. Use --yes to actually delete.");
     }
 }
