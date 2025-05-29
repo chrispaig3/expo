@@ -1,7 +1,8 @@
 [package]
+authors = ["chrispaig3"]
 name = "expo"
 version = "0.0.1"
 edition = "2024"
-
+description = "A dryeraser for unwanted GitHub repos written in Rust."
 [dependencies]
 clap = {version = "4.5.39", features = ["derive"]}
