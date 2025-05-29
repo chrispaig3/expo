@@ -12,4 +12,7 @@
 git clone https://github.com/chrispaig3/expo; cd expo; cargo install --path .
 ```
 
+#### Dependencies
+- gh (GitHub CLI)
+- rustup (if compiling from source)
 
