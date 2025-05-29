@@ -38,7 +38,7 @@ fn refresh_auth() -> bool {
 
 fn main() {
     let cli = Cli::parse();
-    
+
     // Auth check
     match check_auth_status() {
         AuthStatus::Authenticated => {
@@ -47,7 +47,9 @@ fn main() {
         AuthStatus::NeedsRefresh => {
             println!("Authentication needs to be refreshed.");
             if !refresh_auth() {
-                eprintln!("Failed to refresh authentication. Please ensure you have the necessary permissions.");
+                eprintln!(
+                    "Failed to refresh authentication. Please ensure you have the necessary permissions."
+                );
                 return;
             }
         }
@@ -69,7 +71,10 @@ fn main() {
                 eprintln!("Failed to delete repository {}.", repo);
             }
         } else {
-            println!("Dry run: not deleting repository {}. Use --yes to actually delete.", repo);
+            println!(
+                "Dry run: not deleting repository {}. Use --yes to actually delete.",
+                repo
+            );
         }
     }
 }
