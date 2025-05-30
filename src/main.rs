@@ -2,7 +2,7 @@ use clap::Parser;
 use std::process::Command;
 
 #[derive(Parser)]
-#[command(author, version)]
+#[command(version)]
 struct Cli {
     repos: Vec<String>,
 
