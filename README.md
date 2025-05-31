@@ -13,7 +13,7 @@
 - rustup
 
 #### Installation
-- The command will install *Expo* to `.cargo/bin`.
+- The below command will install *Expo* to `.cargo/bin`.
 ```
 cargo install --git https://github.com/chrispaig3/expo
 ```
