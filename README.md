@@ -15,5 +15,5 @@
 #### Installation
 - The one-liner below will clone the repo and compile it to `.cargo/bin`.
 ```
-cargo intall --git https://github.com/chrispaig3/expo
+cargo install --git https://github.com/chrispaig3/expo
 ```
