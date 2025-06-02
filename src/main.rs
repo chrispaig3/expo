@@ -1,5 +1,4 @@
 use clap::Parser;
-use std::process::Command;
 
 #[derive(Parser)]
 #[command(version)]
