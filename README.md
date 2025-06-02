@@ -6,7 +6,7 @@
 
 #### Prerequisites
 - Make sure you have the Rust toolchain `rustup` and `gh` (GitHub CLI) installed.
-
+- After authenticating with GitHub via the CLI; run: `gh auth refresh -h github.com -s delete_repo`
 
 #### Basic Usage
 - expo user/repo
