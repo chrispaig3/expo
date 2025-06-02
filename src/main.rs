@@ -1,10 +1,12 @@
 use clap::Parser;
 use std::process::Command;
 
+type Repo = String;
+
 #[derive(Parser)]
 #[command(version)]
 struct Cli {
-    repos: Vec<String>,
+    repos: Vec<Repo>,
 
     #[arg(long)]
     yes: bool,
