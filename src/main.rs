@@ -12,7 +12,6 @@ struct Cli {
 
 enum AuthStatus {
     Authenticated,
-    NeedsRefresh,
     Failed,
 }
 
@@ -20,20 +19,12 @@ fn check_auth_status() -> AuthStatus {
     let mut auth_check_cmd = Command::new("gh");
     auth_check_cmd.args(["auth", "status", "-h", "github.com"]);
 
-    let auth_check_status = auth_check_cmd.status();
-    match auth_check_status {
+    let status = auth_check_cmd.status();
+    match status {
         Ok(status) if status.success() => AuthStatus::Authenticated,
-        Ok(_) => AuthStatus::NeedsRefresh,
+        Ok(_) => AuthStatus::Failed,
         Err(_) => AuthStatus::Failed,
     }
-}
-
-fn refresh_auth() -> bool {
-    let mut auth_cmd = Command::new("gh");
-    auth_cmd.args(["auth", "refresh", "-h", "github.com", "-s", "delete_repo"]);
-
-    let auth_status = auth_cmd.status();
-    auth_status.map_or(false, |status| status.success())
 }
 
 fn main() {
@@ -44,18 +35,8 @@ fn main() {
         AuthStatus::Authenticated => {
             println!("Authentication successful.");
         }
-        AuthStatus::NeedsRefresh => {
-            println!("Authentication needs to be refreshed.");
-            if !refresh_auth() {
-                eprintln!(
-                    "Failed to refresh authentication. Please ensure you have the necessary permissions."
-                );
-                return;
-            }
-        }
         AuthStatus::Failed => {
-            eprintln!("Failed to check GitHub authentication status.");
-            return;
+            eprintln!("Failed to authenticate with GitHub.");
         }
     }
 
