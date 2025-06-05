@@ -36,7 +36,7 @@ impl<'s> Plugin<'s> {
         }
     }
     
-    fn register(&self, plugin: Plugin) {
+    fn register(&self) {
         todo!()
     }
 }
