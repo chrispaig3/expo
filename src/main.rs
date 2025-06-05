@@ -35,7 +35,8 @@ impl<'s> Plugin<'s> {
             binary_path,
         }
     }
-    fn run(&self, plugin: Plugin) {
+    
+    fn register(&self, plugin: Plugin) {
         todo!()
     }
 }
