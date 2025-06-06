@@ -36,16 +36,16 @@ impl<'s> Plugin<'s> {
         }
     }
     
-    fn register(&self) {
+    fn register(&self, plugin: Plugin) {
         todo!();
     }
 
-    fn unregister(&self) {
+    fn unregister(&self, plugin: Plugin) {
         todo!();
     }
 
     fn run(&self) {
-       todo!(); 
+       todo!() 
     }
 }
 */
