@@ -27,11 +27,11 @@ struct Plugin<'s> {
 }
 
 impl PluginManager for Plugin<'_> {
-    fn register(&self, plugin: Plugin) {
+    fn register(&self) {
         todo!();
     }
 
-    fn unregister(&self, plugin: Plugin) {
+    fn unregister(&self) {
         todo!();
     }
 
