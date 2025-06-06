@@ -12,7 +12,7 @@ struct Cli {
     yes: bool,
 }
 
-/*
+
 trait PluginManager {
     fn register(&self, plugin: Plugin);
     fn unregister(&self, plugin: Plugin);
@@ -26,7 +26,7 @@ struct Plugin<'s> {
     binary_path: &'s str,
 }
 
-impl<'_> PluginManager for Plugin<'_> {
+impl PluginManager for Plugin<'_> {
     fn register(&self, plugin: Plugin) {
         todo!();
     }
@@ -56,9 +56,8 @@ impl<'s> Plugin<'s> {
         }
     }
 }
-*/
 
-enum AuthStatus
+enum  AuthStatus {
     Authenticated,
     Failed,
 }
