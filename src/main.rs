@@ -13,11 +13,31 @@ struct Cli {
 }
 
 /*
+trait PluginManager {
+    fn register(&self, plugin: Plugin);
+    fn unregister(&self, plugin: Plugin);
+    fn run(&self);
+}
+
 struct Plugin<'s> {
     name: &'s str,
     description: &'s str,
     version: &'s str,
     binary_path: &'s str,
+}
+
+impl<'_> PluginManager for Plugin<'_> {
+    fn register(&self, plugin: Plugin) {
+        todo!();
+    }
+
+    fn unregister(&self, plugin: Plugin) {
+        todo!();
+    }
+
+    fn run(&self) {
+       todo!() 
+    }
 }
 
 impl<'s> Plugin<'s> {
@@ -35,22 +55,10 @@ impl<'s> Plugin<'s> {
             binary_path,
         }
     }
-    
-    fn register(&self, plugin: Plugin) {
-        todo!();
-    }
-
-    fn unregister(&self, plugin: Plugin) {
-        todo!();
-    }
-
-    fn run(&self) {
-       todo!() 
-    }
 }
 */
 
-enum AuthStatus {
+enum AuthStatus
     Authenticated,
     Failed,
 }
