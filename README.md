@@ -17,6 +17,3 @@
 ```
 cargo install --git https://github.com/chrispaig3/expo
 ```
-
-Roadmap:
-- [ ] Plugin support (In progress)
