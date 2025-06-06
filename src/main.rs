@@ -12,7 +12,7 @@ struct Cli {
     yes: bool,
 }
 
-
+/*
 trait PluginManager {
     fn register(&self, plugin: Plugin);
     fn unregister(&self, plugin: Plugin);
@@ -56,6 +56,7 @@ impl<'s> Plugin<'s> {
         }
     }
 }
+*/
 
 enum  AuthStatus {
     Authenticated,
