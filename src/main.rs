@@ -14,8 +14,8 @@ struct Cli {
 
 /*
 trait PluginManager {
-    fn register(&self, plugin: Plugin);
-    fn unregister(&self, plugin: Plugin);
+    fn register(&self);
+    fn unregister(&self);
     fn run(&self);
 }
 
