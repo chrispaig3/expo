@@ -12,52 +12,6 @@ struct Cli {
     yes: bool,
 }
 
-/*
-trait PluginManager {
-    fn register(&self);
-    fn unregister(&self);
-    fn run(&self);
-}
-
-struct Plugin<'s> {
-    name: &'s str,
-    description: &'s str,
-    version: &'s str,
-    binary_path: &'s str,
-}
-
-impl PluginManager for Plugin<'_> {
-    fn register(&self) {
-        todo!();
-    }
-
-    fn unregister(&self) {
-        todo!();
-    }
-
-    fn run(&self) {
-       todo!() 
-    }
-}
-
-impl<'s> Plugin<'s> {
-    // A plugin in expo is simply a binary with a manifest.
-    // A manifest will be a plain text file with the following format:
-    // name: <plugin_name>
-    // description: <plugin_description>
-    // version: <plugin_version>
-    // binary_path: <path_to_binary>
-    fn new(name: &'s str, description: &'s str, version: &'s str, binary_path: &'s str) -> Self {
-        Self {
-            name,
-            description,
-            version,
-            binary_path,
-        }
-    }
-}
-*/
-
 enum  AuthStatus {
     Authenticated,
     Failed,
