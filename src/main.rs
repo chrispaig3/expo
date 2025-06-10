@@ -12,7 +12,7 @@ struct Cli {
     yes: bool,
 }
 
-enum  AuthStatus {
+enum AuthStatus {
     Authenticated,
     Failed,
 }
