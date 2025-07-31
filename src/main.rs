@@ -42,8 +42,8 @@ enum VisState {
 }
 
 impl From<VisState> for Visibility {
-    fn from(vis: VisState) -> Self {
-        match vis {
+    fn from(state: VisState) -> Self {
+        match state {
             VisState::Public => Visibility::Public,
             VisState::Private => Visibility::Private,
         }
