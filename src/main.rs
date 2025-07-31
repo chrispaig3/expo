@@ -52,25 +52,25 @@ impl From<VisState> for Visibility {
 
 fn main() -> Result<()> {
     let cli = Cli::parse();
-    let auth_checker = AuthChecker::new();
-    let github_client = GitHubClient::new();
+    let check = AuthChecker::new();
+    let gh = GitHubClient::new();
 
-    auth_checker.verify_authentication()?;
+    check.verify_authentication()?;
 
     match cli.command {
         Commands::Delete { repos, yes } => {
             for repo in repos {
-                github_client.delete_repository(&repo, !yes)?;
+                gh.delete_repository(&repo, !yes)?;
             }
         }
         Commands::Visibility { repos, visibility } => {
             for repo in repos {
-                github_client.change_visibility(&repo, visibility.clone().into())?;
+                gh.change_visibility(&repo, visibility.clone().into())?;
             }
         }
         Commands::Archive { repos, unarchive } => {
             for repo in repos {
-                github_client.archive_repository(&repo, !unarchive)?;
+                gh.archive_repository(&repo, !unarchive)?;
             }
         }
     }
