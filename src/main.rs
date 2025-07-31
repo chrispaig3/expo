@@ -24,12 +24,12 @@ enum Commands {
         yes: bool,
     },
     Visibility {
-        repo: Repo,
+        repos: Vec<Repo>,
         #[arg(value_enum)]
         visibility: VisState,
     },
     Archive {
-        repo: Repo,
+        repos: Vec<Repo>,
         #[arg(long)]
         unarchive: bool,
     },
@@ -63,11 +63,15 @@ fn main() -> Result<()> {
                 github_client.delete_repository(&repo, !yes)?;
             }
         }
-        Commands::Visibility { repo, visibility } => {
-            github_client.change_visibility(&repo, visibility.into())?;
+        Commands::Visibility { repos, visibility } => {
+            for repo in repos {
+                github_client.change_visibility(&repo, visibility.clone().into())?;
+            }
         }
-        Commands::Archive { repo, unarchive } => {
-            github_client.archive_repository(&repo, !unarchive)?;
+        Commands::Archive { repos, unarchive } => {
+            for repo in repos {
+                github_client.archive_repository(&repo, !unarchive)?;
+            }
         }
     }
 
