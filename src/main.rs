@@ -1,63 +1,82 @@
-use clap::Parser;
-use std::process::Command;
+mod auth;
+mod error;
+mod gh;
+
+use auth::AuthChecker;
+use clap::{Parser, Subcommand};
+use error::Result;
+use gh::{GitHubClient, Visibility};
 
 type Repo = String;
 
 #[derive(Parser)]
 #[command(version)]
 struct Cli {
-    repos: Vec<Repo>,
-
-    #[arg(long)]
-    yes: bool,
+    #[command(subcommand)]
+    command: Commands,
 }
 
-enum AuthStatus {
-    Authenticated,
-    Failed,
+#[derive(Subcommand)]
+enum Commands {
+    Delete {
+        repos: Vec<Repo>,
+        #[arg(long)]
+        yes: bool,
+    },
+    Visibility {
+        repo: Repo,
+        #[arg(value_enum)]
+        visibility: VisState,
+    },
+    Archive {
+        repo: Repo,
+        #[arg(long)]
+        unarchive: bool,
+    },
 }
 
-fn check_auth_status() -> AuthStatus {
-    let mut auth_check_cmd = Command::new("gh");
-    auth_check_cmd.args(["auth", "status", "-h", "github.com"]);
+#[derive(clap::ValueEnum, Clone, Debug)]
+enum VisState {
+    Public,
+    Private,
+}
 
-    let status = auth_check_cmd.status();
-    match status {
-        Ok(status) if status.success() => AuthStatus::Authenticated,
-        Ok(_) => AuthStatus::Failed,
-        Err(_) => AuthStatus::Failed,
+impl From<VisState> for Visibility {
+    fn from(vis: VisState) -> Self {
+        match vis {
+            VisState::Public => Visibility::Public,
+            VisState::Private => Visibility::Private,
+        }
     }
+}
+
+fn run() -> Result<()> {
+    let cli = Cli::parse();
+    let auth_checker = AuthChecker::new();
+    let github_client = GitHubClient::new();
+
+    auth_checker.verify_authentication()?;
+
+    match cli.command {
+        Commands::Delete { repos, yes } => {
+            for repo in repos {
+                github_client.delete_repository(&repo, !yes)?;
+            }
+        }
+        Commands::Visibility { repo, visibility } => {
+            github_client.change_visibility(&repo, visibility.into())?;
+        }
+        Commands::Archive { repo, unarchive } => {
+            github_client.archive_repository(&repo, !unarchive)?;
+        }
+    }
+
+    Ok(())
 }
 
 fn main() {
-    let cli = Cli::parse();
-
-    // Auth check
-    match check_auth_status() {
-        AuthStatus::Authenticated => {
-            println!("Authentication successful.");
-        }
-        AuthStatus::Failed => {
-            eprintln!("Failed to authenticate with GitHub.");
-        }
-    }
-
-    for repo in cli.repos {
-        let mut cmd = Command::new("gh");
-        cmd.args(["api", "-X", "DELETE", &format!("repos/{}", repo)]);
-
-        if cli.yes {
-            let status = cmd.status().expect("Failed to execute gh command");
-            if status.success() {
-                println!("Repository {} deleted.", repo);
-            } else {
-                eprintln!("Failed to delete repository {}.", repo);
-            }
-        } else {
-            println!(
-                "Dry run: not deleting repository {}. Use --yes to actually delete.",
-                repo
-            );
-        }
+    if let Err(e) = run() {
+        eprintln!("Error: {}", e);
+        std::process::exit(1);
     }
 }

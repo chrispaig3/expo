@@ -9,7 +9,11 @@
 - If you are already authenticated with GitHub via the CLI; run: `gh auth refresh -h github.com -s delete_repo`
 
 #### Basic Usage
-- expo user/repo
+- expo delete user/repo
+
+#### Extra
+- expo archive user/repo [--unarchive]
+- expo visibility user/repo [publice|private]
 
 #### Installation
 - The below command will install *Expo* to `.cargo/bin`.
