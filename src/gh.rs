@@ -33,7 +33,10 @@ impl GitHubClient {
             if stderr.contains("Not Found") {
                 Err(ExpoError::RepositoryNotFound(repo.to_string()))
             } else {
-                Err(ExpoError::GitHubCommandFailed(format!("{} repository {}", operation, repo)))
+                Err(ExpoError::GitHubCommandFailed(format!(
+                    "{} repository {}",
+                    operation, repo
+                )))
             }
         }
     }
@@ -42,14 +45,17 @@ impl GitHubClient {
         self.validate_repo_format(repo)?;
 
         if dry_run {
-            println!("Dry run: not deleting repository {}. Use --yes to actually delete.", repo);
+            println!(
+                "Dry run: not deleting repository {}. Use --yes to actually delete.",
+                repo
+            );
             return Ok(());
         }
 
         let args = ["api", "-X", "DELETE", &format!("repos/{}", repo)];
         let output = self.execute_gh_command(&args)?;
         self.handle_gh_response(output, "delete", repo)?;
-        
+
         println!("Repository {} deleted.", repo);
         Ok(())
     }
@@ -63,14 +69,21 @@ impl GitHubClient {
         };
 
         let args = [
-            "api", "-X", "PATCH", &format!("repos/{}", repo),
-            "-f", &format!("private={}", visibility_str)
+            "api",
+            "-X",
+            "PATCH",
+            &format!("repos/{}", repo),
+            "-f",
+            &format!("private={}", visibility_str),
         ];
-        
+
         let output = self.execute_gh_command(&args)?;
         self.handle_gh_response(output, "change visibility for", repo)?;
-        
-        println!("Repository {} visibility changed to {:?}.", repo, visibility);
+
+        println!(
+            "Repository {} visibility changed to {:?}.",
+            repo, visibility
+        );
         Ok(())
     }
 
@@ -78,14 +91,18 @@ impl GitHubClient {
         self.validate_repo_format(repo)?;
 
         let args = [
-            "api", "-X", "PATCH", &format!("repos/{}", repo),
-            "-f", &format!("archived={}", archive)
+            "api",
+            "-X",
+            "PATCH",
+            &format!("repos/{}", repo),
+            "-f",
+            &format!("archived={}", archive),
         ];
-        
+
         let output = self.execute_gh_command(&args)?;
         let action = if archive { "archive" } else { "unarchive" };
         self.handle_gh_response(output, action, repo)?;
-        
+
         if archive {
             println!("Repository {} archived.", repo);
         } else {

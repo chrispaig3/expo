@@ -50,7 +50,7 @@ impl From<VisState> for Visibility {
     }
 }
 
-fn run() -> Result<()> {
+fn main() -> Result<()> {
     let cli = Cli::parse();
     let auth_checker = AuthChecker::new();
     let github_client = GitHubClient::new();
@@ -72,11 +72,4 @@ fn run() -> Result<()> {
     }
 
     Ok(())
-}
-
-fn main() {
-    if let Err(e) = run() {
-        eprintln!("Error: {}", e);
-        std::process::exit(1);
-    }
 }
