@@ -16,6 +16,7 @@
 - expo visibility user/repo [publice|private]
 
 #### Installation
+> Less than half of a megabyte in size: ***487.7 kb***
 - The below command will install *Expo* to `.cargo/bin`.
 
 ```
