@@ -17,8 +17,6 @@
 
 #### Basic Usage
 - expo delete user/repo
-
-#### Extra
 - expo archive user/repo [--unarchive]
 - expo visibility user/repo [publice|private]
 
