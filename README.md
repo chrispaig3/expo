@@ -1,6 +1,13 @@
 # Expo
 
+## Inspiration
+> The name ***Expo*** was inspired by the popular dry erasers and markers.
+
 ![Image](https://github.com/user-attachments/assets/a3f1f574-c9f9-4caf-9573-9ac29594a53f)
+
+### **Motivation**
+> The GitHub CLI currently supports managing one repository at a time.
+> This is obviously inconvenient when you have accumulated a large number of GitHub repositories.
 
 ### ***Warning: This program has destructive capabilities (use at own risk)***
 
