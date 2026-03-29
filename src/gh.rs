@@ -1,7 +1,7 @@
 use crate::error::{ExpoError, Result};
 use std::process::{Command, Output, Stdio};
 
-#[derive(Clone, Debug)]
+#[derive(Clone)]
 pub enum Visibility {
     Public,
     Private,
@@ -24,13 +24,13 @@ impl GitHubClient {
                 .stdout(Stdio::piped())
                 .stderr(Stdio::piped())
                 .output()
-                .map_err(|_| ExpoError::CommandExecution("gh".to_string()))
+                .map_err(|_| ExpoError::CommandExecution)
         })
         .await
-        .map_err(|_| ExpoError::CommandExecution("gh task".to_string()))?
+        .map_err(|_| ExpoError::CommandExecution)?
     }
 
-    fn handle_gh_response(&self, output: Output, operation: &str, repo: &str) -> Result<()> {
+    fn handle_gh_response(&self, output: Output, repo: &str) -> Result<()> {
         if output.status.success() {
             Ok(())
         } else {
@@ -38,10 +38,7 @@ impl GitHubClient {
             if stderr.contains("Not Found") {
                 Err(ExpoError::RepositoryNotFound(repo.to_string()))
             } else {
-                Err(ExpoError::GitHubCommandFailed(format!(
-                    "{} repository {}",
-                    operation, repo
-                )))
+                Err(ExpoError::GitHubCommandFailed)
             }
         }
     }
@@ -50,16 +47,14 @@ impl GitHubClient {
         self.validate_repo_format(repo)?;
 
         if dry_run {
-            println!(
-                "Dry run: not deleting repository {}. Use --yes to actually delete.",
-                repo
-            );
+            println!("Dry run: not deleting repository {}. Use --yes to actually delete.", repo);
             return Ok(());
         }
 
-        let args = ["api", "-X", "DELETE", &format!("repos/{}", repo)];
+        let endpoint = format!("repos/{}", repo);
+        let args = ["api", "-X", "DELETE", &endpoint];
         let output = self.execute_gh_command(&args).await?;
-        self.handle_gh_response(output, "delete", repo)?;
+        self.handle_gh_response(output, repo)?;
 
         println!("Repository {} deleted.", repo);
         Ok(())
@@ -73,47 +68,67 @@ impl GitHubClient {
             Visibility::Private => "true",
         };
 
-        let args = [
-            "api",
-            "-X",
-            "PATCH",
-            &format!("repos/{}", repo),
-            "-f",
-            &format!("private={}", visibility_str),
-        ];
+        let endpoint = format!("repos/{}", repo);
+        let private_arg = format!("private={}", visibility_str);
+        let args = ["api", "-X", "PATCH", &endpoint, "-f", &private_arg];
 
         let output = self.execute_gh_command(&args).await?;
-        self.handle_gh_response(output, "change visibility for", repo)?;
+        self.handle_gh_response(output, repo)?;
 
-        println!(
-            "Repository {} visibility changed to {:?}.",
-            repo, visibility
-        );
+        let vis_name = match visibility {
+            Visibility::Public => "Public",
+            Visibility::Private => "Private",
+        };
+        println!("Repository {} visibility changed to {}.", repo, vis_name);
         Ok(())
     }
 
     pub async fn archive_repository(&self, repo: &str, archive: bool) -> Result<()> {
         self.validate_repo_format(repo)?;
 
-        let args = [
-            "api",
-            "-X",
-            "PATCH",
-            &format!("repos/{}", repo),
-            "-f",
-            &format!("archived={}", archive),
-        ];
+        let endpoint = format!("repos/{}", repo);
+        let archived_arg = format!("archived={}", archive);
+        let args = ["api", "-X", "PATCH", &endpoint, "-f", &archived_arg];
 
         let output = self.execute_gh_command(&args).await?;
-        let action = if archive { "archive" } else { "unarchive" };
-        self.handle_gh_response(output, action, repo)?;
+        self.handle_gh_response(output, repo)?;
 
-        if archive {
-            println!("Repository {} archived.", repo);
-        } else {
-            println!("Repository {} unarchived.", repo);
-        }
+        let action = if archive { "archived" } else { "unarchived" };
+        println!("Repository {} {}.", repo, action);
         Ok(())
+    }
+
+    pub async fn create_repository(&self, repo: &str, public: bool, description: Option<&str>) -> Result<()> {
+        self.validate_repo_format(repo)?;
+
+        let repo_name = repo.split('/').nth(1).unwrap();
+        let name_arg = format!("name={}", repo_name);
+        let private_arg = format!("private={}", !public);
+        let endpoint = "user/repos";
+
+        let mut args = vec!["api", "-X", "POST", endpoint, "-f", &name_arg, "-f", &private_arg];
+
+        let desc_arg;
+        if let Some(desc) = description {
+            desc_arg = format!("description={}", desc);
+            args.push("-f");
+            args.push(&desc_arg);
+        }
+
+        let output = self.execute_gh_command(&args).await?;
+        
+        if output.status.success() {
+            println!("Repository {} created successfully.", repo);
+            Ok(())
+        } else {
+            let stderr = String::from_utf8_lossy(&output.stderr);
+            if stderr.contains("already exists") {
+                eprintln!("Repository {} already exists", repo);
+            } else {
+                eprintln!("Failed to create repository {}: {}", repo, stderr);
+            }
+            Err(ExpoError::GitHubCommandFailed)
+        }
     }
 
     fn validate_repo_format(&self, repo: &str) -> Result<()> {

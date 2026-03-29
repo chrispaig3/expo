@@ -6,9 +6,9 @@ edition = "2024"
 license = "MIT"
 description = "A dry eraser for unwanted GitHub repos written in Rust."
 [dependencies]
-clap = { version = "4.5.39", features = ["derive"] }
-tokio = { version = "1.41", features = ["rt-multi-thread", "macros"] }
-futures = "0.3"
+clap = { version = "4.5.39", default-features = false, features = ["std", "help", "usage", "error-context", "derive"] }
+tokio = { version = "1.41", default-features = false, features = ["rt", "macros"] }
+futures = { version = "0.3", default-features = false, features = ["alloc"] }
 
 [profile.release]
 strip = true
@@ -16,3 +16,4 @@ opt-level = "z"
 lto = true
 codegen-units = 1
 panic = "abort"
+incremental = false

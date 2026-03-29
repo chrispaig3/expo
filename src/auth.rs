@@ -14,7 +14,7 @@ impl AuthChecker {
             .stdout(Stdio::null())
             .stderr(Stdio::null())
             .status()
-            .map_err(|_| ExpoError::CommandExecution("gh auth status".to_string()))?;
+            .map_err(|_| ExpoError::CommandExecution)?;
 
         if output.success() {
             println!("Authentication successful.");
