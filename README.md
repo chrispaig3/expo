@@ -41,7 +41,7 @@ expo create user/repo --public --description "My awesome project"
 ```
 
 #### Installation
-> Less than half of a megabyte in size: ***380.0 kb***
+> Less than half of a megabyte in size: ***388.7 kb***
 - The below command will install *Expo* to `.cargo/bin`.
 
 ```
