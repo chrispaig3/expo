@@ -7,6 +7,7 @@ pub enum Visibility {
     Private,
 }
 
+#[derive(Clone)]
 pub struct GitHubClient;
 
 impl GitHubClient {
@@ -14,15 +15,19 @@ impl GitHubClient {
         Self
     }
 
-    fn execute_gh_command(&self, args: &[&str]) -> Result<Output> {
-        let output = Command::new("gh")
-            .args(args)
-            .stdout(Stdio::piped())
-            .stderr(Stdio::piped())
-            .output()
-            .map_err(|_| ExpoError::CommandExecution("gh".to_string()))?;
-
-        Ok(output)
+    async fn execute_gh_command(&self, args: &[&str]) -> Result<Output> {
+        let args_owned: Vec<String> = args.iter().map(|s| s.to_string()).collect();
+        
+        tokio::task::spawn_blocking(move || {
+            Command::new("gh")
+                .args(&args_owned)
+                .stdout(Stdio::piped())
+                .stderr(Stdio::piped())
+                .output()
+                .map_err(|_| ExpoError::CommandExecution("gh".to_string()))
+        })
+        .await
+        .map_err(|_| ExpoError::CommandExecution("gh task".to_string()))?
     }
 
     fn handle_gh_response(&self, output: Output, operation: &str, repo: &str) -> Result<()> {
@@ -41,7 +46,7 @@ impl GitHubClient {
         }
     }
 
-    pub fn delete_repository(&self, repo: &str, dry_run: bool) -> Result<()> {
+    pub async fn delete_repository(&self, repo: &str, dry_run: bool) -> Result<()> {
         self.validate_repo_format(repo)?;
 
         if dry_run {
@@ -53,14 +58,14 @@ impl GitHubClient {
         }
 
         let args = ["api", "-X", "DELETE", &format!("repos/{}", repo)];
-        let output = self.execute_gh_command(&args)?;
+        let output = self.execute_gh_command(&args).await?;
         self.handle_gh_response(output, "delete", repo)?;
 
         println!("Repository {} deleted.", repo);
         Ok(())
     }
 
-    pub fn change_visibility(&self, repo: &str, visibility: Visibility) -> Result<()> {
+    pub async fn change_visibility(&self, repo: &str, visibility: Visibility) -> Result<()> {
         self.validate_repo_format(repo)?;
 
         let visibility_str = match visibility {
@@ -77,7 +82,7 @@ impl GitHubClient {
             &format!("private={}", visibility_str),
         ];
 
-        let output = self.execute_gh_command(&args)?;
+        let output = self.execute_gh_command(&args).await?;
         self.handle_gh_response(output, "change visibility for", repo)?;
 
         println!(
@@ -87,7 +92,7 @@ impl GitHubClient {
         Ok(())
     }
 
-    pub fn archive_repository(&self, repo: &str, archive: bool) -> Result<()> {
+    pub async fn archive_repository(&self, repo: &str, archive: bool) -> Result<()> {
         self.validate_repo_format(repo)?;
 
         let args = [
@@ -99,7 +104,7 @@ impl GitHubClient {
             &format!("archived={}", archive),
         ];
 
-        let output = self.execute_gh_command(&args)?;
+        let output = self.execute_gh_command(&args).await?;
         let action = if archive { "archive" } else { "unarchive" };
         self.handle_gh_response(output, action, repo)?;
 

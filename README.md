@@ -16,18 +16,27 @@
 - If you are already authenticated with GitHub via the CLI; run: `gh auth refresh -h github.com -s delete_repo`
 
 #### Basic Usage
-- expo delete user/repo
+- expo delete user/repo [--yes]
 - expo archive user/repo [--unarchive]
-- expo visibility user/repo [public|private]
+- expo visibility [public|private] user/repo
 
 ```sh
 # Pass multiple repos across different users or organizations that you have write access to.
 
 expo delete example1/repo example2/repo example3/repo
+
+# Delete multiple repositories concurrently
+expo delete example1/repo example2/repo example3/repo --yes
+
+# Change visibility of multiple repositories concurrently
+expo visibility public user1/repo1 user2/repo2 user3/repo3
+
+# Archive multiple repositories concurrently
+expo archive org1/repo1 org2/repo2 org3/repo3
 ```
 
 #### Installation
-> Less than half of a megabyte in size: ***487.7 kb***
+> Less than half of a megabyte in size: ***539.0 kb***
 - The below command will install *Expo* to `.cargo/bin`.
 
 ```
