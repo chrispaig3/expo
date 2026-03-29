@@ -18,7 +18,13 @@
 #### Basic Usage
 - expo delete user/repo
 - expo archive user/repo [--unarchive]
-- expo visibility user/repo [publice|private]
+- expo visibility user/repo [public|private]
+
+```sh
+# Pass multiple repos across different users or organizations that you have write access to.
+
+expo delete example1/repo example2/repo example3/repo
+```
 
 #### Installation
 > Less than half of a megabyte in size: ***487.7 kb***
