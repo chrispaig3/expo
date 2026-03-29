@@ -22,24 +22,24 @@
 - expo create user/repo [--public] [--description "text"]
 
 ```sh
-# Pass multiple repos across different users or organizations that you have write access to.
+# Pass multiple repos that you have write access to.
 
-expo delete example1/repo example2/repo example3/repo
+expo delete user/repo user/repo user/repo
 
 # Delete multiple repositories concurrently
-expo delete example1/repo example2/repo example3/repo --yes
+expo delete user/repo user/repo user/repo --yes
 
 # Change visibility of multiple repositories concurrently
-expo visibility public user1/repo1 user2/repo2 user3/repo3
+expo visibility public user/repo1 user/repo2 user/repo3
 
 # Archive multiple repositories concurrently
-expo archive org1/repo1 org2/repo2 org3/repo3
+expo archive user/repo1 user/repo2 user/repo3
 
 # Create multiple repositories concurrently (private by default)
-expo create user1/new-repo1 user2/new-repo2
+expo create user/repo1 user/repo2
 
 # Create public repositories with descriptions
-expo create user/my-repo --public --description "My awesome project"
+expo create user/repo --public --description "My awesome project"
 ```
 
 #### Installation
