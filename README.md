@@ -24,8 +24,6 @@
 ```sh
 # Pass multiple repos that you have write access to.
 
-expo delete user/repo1 user/repo2 user/repo3
-
 # Delete multiple repositories concurrently
 expo delete user/repo1 user/repo2 user/repo3 --yes
 
