@@ -3,6 +3,12 @@ use std::process::{Command, Stdio};
 
 pub struct AuthChecker;
 
+impl Default for AuthChecker {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl AuthChecker {
     pub fn new() -> Self {
         Self

@@ -10,6 +10,12 @@ pub enum Visibility {
 #[derive(Clone)]
 pub struct GitHubClient;
 
+impl Default for GitHubClient {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl GitHubClient {
     pub fn new() -> Self {
         Self
@@ -43,6 +49,15 @@ impl GitHubClient {
         }
     }
 
+    async fn patch_repo(&self, repo: &str, field: &str, value: &str) -> Result<()> {
+        self.validate_repo_format(repo)?;
+        let endpoint = format!("repos/{}", repo);
+        let field_arg = format!("{}={}", field, value);
+        let args = ["api", "-X", "PATCH", &endpoint, "-f", &field_arg];
+        let output = self.execute_gh_command(&args).await?;
+        self.handle_gh_response(output, repo)
+    }
+
     pub async fn delete_repository(&self, repo: &str, dry_run: bool) -> Result<()> {
         self.validate_repo_format(repo)?;
 
@@ -61,37 +76,19 @@ impl GitHubClient {
     }
 
     pub async fn change_visibility(&self, repo: &str, visibility: Visibility) -> Result<()> {
-        self.validate_repo_format(repo)?;
-
-        let visibility_str = match visibility {
-            Visibility::Public => "false",
-            Visibility::Private => "true",
+        let (value, name) = match visibility {
+            Visibility::Public => ("false", "Public"),
+            Visibility::Private => ("true", "Private"),
         };
 
-        let endpoint = format!("repos/{}", repo);
-        let private_arg = format!("private={}", visibility_str);
-        let args = ["api", "-X", "PATCH", &endpoint, "-f", &private_arg];
-
-        let output = self.execute_gh_command(&args).await?;
-        self.handle_gh_response(output, repo)?;
-
-        let vis_name = match visibility {
-            Visibility::Public => "Public",
-            Visibility::Private => "Private",
-        };
-        println!("Repository {} visibility changed to {}.", repo, vis_name);
+        self.patch_repo(repo, "private", value).await?;
+        println!("Repository {} visibility changed to {}.", repo, name);
         Ok(())
     }
 
     pub async fn archive_repository(&self, repo: &str, archive: bool) -> Result<()> {
-        self.validate_repo_format(repo)?;
-
-        let endpoint = format!("repos/{}", repo);
-        let archived_arg = format!("archived={}", archive);
-        let args = ["api", "-X", "PATCH", &endpoint, "-f", &archived_arg];
-
-        let output = self.execute_gh_command(&args).await?;
-        self.handle_gh_response(output, repo)?;
+        let value = if archive { "true" } else { "false" };
+        self.patch_repo(repo, "archived", value).await?;
 
         let action = if archive { "archived" } else { "unarchived" };
         println!("Repository {} {}.", repo, action);
@@ -104,15 +101,13 @@ impl GitHubClient {
         let repo_name = repo.split('/').nth(1).unwrap();
         let name_arg = format!("name={}", repo_name);
         let private_arg = format!("private={}", !public);
-        let endpoint = "user/repos";
-
-        let mut args = vec!["api", "-X", "POST", endpoint, "-f", &name_arg, "-f", &private_arg];
+        
+        let mut args = vec!["api", "-X", "POST", "user/repos", "-f", &name_arg, "-f", &private_arg];
 
         let desc_arg;
         if let Some(desc) = description {
             desc_arg = format!("description={}", desc);
-            args.push("-f");
-            args.push(&desc_arg);
+            args.extend_from_slice(&["-f", &desc_arg]);
         }
 
         let output = self.execute_gh_command(&args).await?;
