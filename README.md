@@ -24,16 +24,16 @@
 ```sh
 # Pass multiple repos that you have write access to.
 
-# Delete multiple repositories concurrently
+# Delete multiple repositories
 expo delete user/repo1 user/repo2 user/repo3 --yes
 
-# Change visibility of multiple repositories concurrently
+# Change visibility of multiple repositories
 expo visibility public user/repo1 user/repo2 user/repo3
 
-# Archive multiple repositories concurrently
+# Archive multiple repositories
 expo archive user/repo1 user/repo2 user/repo3
 
-# Create multiple repositories concurrently (private by default)
+# Create multiple repositories (private by default)
 expo create user/repo1 user/repo2
 
 # Create public repositories with descriptions
