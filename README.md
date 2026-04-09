@@ -38,6 +38,8 @@ expo create user/repo1 user/repo2
 
 # Create public repositories with descriptions
 expo create user/repo --public --description "My awesome project"
+# or
+expo create user/repo --description "Example1" user/repo --description "example2"
 ```
 
 #### Installation
