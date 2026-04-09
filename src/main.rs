@@ -23,7 +23,7 @@ enum Commands {
     Create {
         repos: Vec<String>,
         public: bool,
-        description: Option<String>,
+        descriptions: Option<Vec<String>>,
     },
 }
 
@@ -34,7 +34,7 @@ fn print_usage() {
     eprintln!("  delete <REPOS>... [--yes]        Delete repositories");
     eprintln!("  visibility <public|private> <REPOS>...  Change repository visibility");
     eprintln!("  archive <REPOS>... [--unarchive] Archive or unarchive repositories");
-    eprintln!("  create <REPOS>... [--public] [--description <DESC>]  Create repositories");
+    eprintln!("  create <REPOS>... [--public] [--description <DESC>]...  Create repositories");
     eprintln!("\nOptions:");
     eprintln!("  -h, --help     Print help");
     eprintln!("  -v, --version  Print version");
@@ -108,7 +108,7 @@ fn parse_args() -> Result<Commands> {
         }
         "create" => {
             let mut public = false;
-            let mut description = None;
+            let mut descriptions = Vec::new();
             let mut repos = Vec::new();
             let mut i = 2;
 
@@ -120,7 +120,7 @@ fn parse_args() -> Result<Commands> {
                     }
                     "--description" => {
                         if i + 1 < args.len() {
-                            description = Some(args[i + 1].clone());
+                            descriptions.push(args[i + 1].clone());
                             i += 2;
                         } else {
                             exit_with_error("--description requires a value");
@@ -134,7 +134,7 @@ fn parse_args() -> Result<Commands> {
                 }
             }
 
-            Ok(Commands::Create { repos: require_repos(repos, "create")?, public, description })
+            Ok(Commands::Create { repos: require_repos(repos, "create")?, public, descriptions: if descriptions.is_empty() { None } else { Some(descriptions) } })
         }
         _ => {
             eprintln!("Error: unknown command '{}'", args[1]);
@@ -188,11 +188,11 @@ async fn main() -> Result<()> {
                 gh.archive_repository(&repo, !unarchive).await
             }).await;
         }
-        Commands::Create { repos, public, description } => {
-            execute_concurrent(repos, gh, move |gh, repo| {
-                let desc = description.clone();
-                async move { gh.create_repository(&repo, public, desc.as_deref()).await }
-            }).await;
+        Commands::Create { repos, public, descriptions } => {
+            for (index, repo) in repos.into_iter().enumerate() {
+                let desc = descriptions.as_ref().and_then(|descs| descs.get(index)).map(|s| s.as_str());
+                gh.create_repository(&repo, public, desc).await?;
+            }
         }
     }
 
